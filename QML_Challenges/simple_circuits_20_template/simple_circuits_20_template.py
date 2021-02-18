@@ -4,6 +4,7 @@ from pennylane import numpy as np
 import sys
 
 
+
 def simple_circuits_20(angle):
     """The code you write for this challenge should be completely contained within this function
     between the # QHACK # comment markers.
@@ -22,14 +23,19 @@ def simple_circuits_20(angle):
     # QHACK #
 
     # Step 1 : initalize a device
+    num_wires = 1
+    dev = qml.device('default.qubit', wires=num_wires)
 
     # Step 2 : Create a quantum circuit and qnode
-
+    @qml.qnode(dev)
+    def circuit(angle): 
+        qml.RX(angle, wires=0)
+        return qml.probs(0)
     # Step 3 : Run the qnode
-    # prob = ?
-
+    prob = circuit(angle)
+    
     # QHACK #
-    return prob
+    return prob[0]
 
 
 if __name__ == "__main__":
@@ -43,7 +49,7 @@ if __name__ == "__main__":
 
     if isinstance(ans, np.tensor):
         ans = ans.item()
-
+    
     if not isinstance(ans, float):
         raise TypeError("the simple_circuits_20 function needs to return a float")
 
