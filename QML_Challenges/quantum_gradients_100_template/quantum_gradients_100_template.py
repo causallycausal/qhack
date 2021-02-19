@@ -8,14 +8,11 @@ from pennylane import numpy as np
 def parameter_shift(weights):
     """Compute the gradient of the variational circuit given by the
     ansatz function using the parameter-shift rule.
-
     Write your code below between the # QHACK # markers—create a device with
     the correct number of qubits, create a QNode that applies the above ansatz,
     and compute the gradient of the provided ansatz using the parameter-shift rule.
-
     Args:
         weights (array): An array of floating-point numbers with size (2, 3).
-
     Returns:
         array: The gradient of the variational circuit. The shape should match
         the input weights array.
@@ -36,26 +33,27 @@ def parameter_shift(weights):
         return qml.expval(qml.PauliY(0) @ qml.PauliZ(2))
 
     gradient = np.zeros_like(weights)
-    
+
     # QHACK #
-    def parameter_shift_term(qnode, weights, i): 
+    #
+    def parameter_shift_term(qnode, weights, i,j): 
         shifted = weights.copy() 
-        shifted[i] += np.pi/2
-        forward = qnode(shifted) # forward evaluation 
-
-        shifted[i] -= np.pi/2 
-        backward = qnode(shifted) # backward evaluation 
-        
+        shifted[i,j] += np.pi/2
+        forward = qnode(shifted) # forward evaluation
+        shifted[i,j] -= np.pi 
+        backward = qnode(shifted) # backward evaluation
         return 0.5 * (forward - backward)
-    def parameter_shift(qnode, weights): 
-        gradients = np.zeros([len(weights)])
 
-        for i in range(len(weights)): 
-            gradients[i] = parameter_shift_term(qnode, weights, i)
-            
+    def parameter_shift(qnode, weights): 
+        gradients = np.zeros_like(weights)
+        print(len(weights))
+
+        for i in range(weights.shape[0]):
+            for j in range(weights.shape[1]):
+                gradients[i,j] = parameter_shift_term(qnode, weights, i,j)
         return gradients 
 
-    graident = parameter_shift(circuit, weights)
+    gradient = parameter_shift(circuit, weights)
     # QHACK #
 
     return gradient
