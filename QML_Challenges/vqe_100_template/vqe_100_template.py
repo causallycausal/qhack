@@ -8,13 +8,10 @@ import numpy as np
 def variational_ansatz(params, wires):
     """
     DO NOT MODIFY anything in this function! It is used to judge your solution.
-
     This is ansatz is used to help with the problem structure. It applies
     alternating layers of rotations and CNOTs.
-
     Don't worry about the contents of this function for now—you'll be designing
     your own ansatze in a later problem.
-
     Args:
         params (np.ndarray): An array of floating-point numbers with size (n, 3),
             where n is the number of parameter sets required (this is determined by
@@ -48,12 +45,9 @@ def variational_ansatz(params, wires):
 def run_vqe(H):
     """Runs the variational quantum eigensolver on the problem Hamiltonian using the
     variational ansatz specified above.
-
     Fill in the missing parts between the # QHACK # markers below to run the VQE.
-
     Args:
         H (qml.Hamiltonian): The input Hamiltonian
-
     Returns:
         The ground state energy of the Hamiltonian.
     """
@@ -69,7 +63,16 @@ def run_vqe(H):
     # Create a quantum device, set up a cost funtion and optimizer, and run the VQE.
     # (We recommend ~500 iterations to ensure convergence for this problem,
     # or you can design your own convergence criteria)
-
+    dev = qml.device("default.qubit", wires=2)
+    circuit = qml.QNode(variational_ansatz, dev)
+    eta=0.01
+    opt = qml.AdamOptimizer(stepsize=0.03)
+    # for i in range(500):
+    cost_fn = qml.ExpvalCost(variational_ansatz, H, dev)
+    for i in range(500):
+        theta_new = opt.step(cost_fn, params)
+        params = theta_new
+    energy = cost_fn(theta_new)
     # QHACK #
 
     # Return the ground state energy
@@ -79,12 +82,9 @@ def run_vqe(H):
 def pauli_token_to_operator(token):
     """
     DO NOT MODIFY anything in this function! It is used to judge your solution.
-
     Helper function to turn strings into qml operators.
-
     Args:
         token (str): A Pauli operator input in string form.
-
     Returns:
         A qml.Operator instance of the Pauli.
     """
@@ -115,12 +115,9 @@ def pauli_token_to_operator(token):
 def parse_hamiltonian_input(input_data):
     """
     DO NOT MODIFY anything in this function! It is used to judge your solution.
-
     Turns the contents of the input file into a Hamiltonian.
-
     Args:
         filename(str): Name of the input file that contains the Hamiltonian.
-
     Returns:
         qml.Hamiltonian object of the Hamiltonian specified in the file.
     """
