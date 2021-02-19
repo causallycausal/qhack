@@ -11,16 +11,13 @@ NUM_PARAMETERS = LAYERS * WIRES * 3
 
 def optimize_circuit(params):
     """Minimize the variational circuit and return its minimum value.
-
     The code you write for this challenge should be completely contained within this function
     between the # QHACK # comment markers. You should create a device and convert the
     variational_circuit function into an executable QNode. Next, you should minimize the variational
     circuit using gradient-based optimization to update the input params. Return the optimized value
     of the QNode as a single floating-point number.
-
     Args:
         params (np.ndarray): Input parameters to be optimized, of dimension 30
-
     Returns:
         float: the value of the optimized QNode
     """
@@ -30,13 +27,30 @@ def optimize_circuit(params):
     # QHACK #
 
     # Initialize the device
-    # dev = ...
+    dev = qml.device("default.qubit", wires=2)
 
     # Instantiate the QNode
-    # circuit = qml.QNode(variational_circuit, dev)
+    circuit = qml.QNode(variational_circuit, dev)
 
     # Minimize the circuit
+    # eta = 0.01
 
+    opt = qml.AdamOptimizer()
+    # print(circuit.shape)
+    # print(qml.ExpvalCost(variational_circuit, params, dev))
+    # print(cost_fn)
+    # print(40400)
+    # for i in range(20):
+    # print(circuit(params))
+    for i in range(200):
+        theta_new = opt.step(circuit, params)
+        params = theta_new        
+    # print(circuit(theta_new))
+    optimal_value = circuit(theta_new)
+
+        # print('inloop')
+    
+    # print(variational_circuit(params))
     # QHACK #
 
     # Return the value of the minimized QNode
@@ -46,14 +60,11 @@ def optimize_circuit(params):
 def variational_circuit(params):
     """
     # DO NOT MODIFY anything in this function! It is used to judge your solution.
-
     This is a template variational quantum circuit containing a fixed layout of gates with variable
     parameters. To be used as a QNode, it must either be wrapped with the @qml.qnode decorator or
     converted using the qml.QNode function (as shown above).
-
     The output of this circuit is the expectation value of a Hamiltonian. An unknown Hamiltonian
     will be used to judge your solution.
-
     Args:
         params (np.ndarray): An array of optimizable parameters of shape (30,)
     """
