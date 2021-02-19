@@ -46,8 +46,38 @@ def gradient_200(weights, dev):
     hessian = np.zeros([5, 5], dtype=np.float64)
 
     # QHACK #
+    print("Weights", weights)
+    same_value = 2 * circuit(weights)
+    for i in range(5): 
+        shifted = weights.copy() 
+        shifted[i] += np.pi/2 
 
-    # QHACK #
+        forward = circuit(shifted) # forward evaluation 
+
+        shifted[i] -= np.pi 
+        backward = circuit(shifted) # backward evaluation 
+
+        grad = 0.5 * (forward - backward) 
+        gradient[i] = grad # assign gradient 
+       
+        hess = 0.5 * (forward + backward - same_value)
+        hessian[i,i] = hess 
+        print("Hessian", hessian[i][i])
+        for j in range(i+1, 5): 
+            # create standard basis vectors 
+            standard_i = np.zeros(5) 
+            standard_i[i] = 1.0 
+            standard_j = np.zeros(5) 
+            standard_j[j] = 1.0 
+            
+            hessian[i, j] = (circuit(weights + np.pi/2 *(standard_i + standard_j))
+            - circuit(weights + np.pi/2 * (-1*standard_i + standard_j))
+            - circuit(weights + np.pi/2 * (standard_i - standard_j)) 
+            + circuit(weights - np.pi/2 * (standard_i + standard_j)))/4
+        
+        # Fix matrix size 
+        hessian = hessian + hessian.T - np.diag(np.diag(hessian))
+       # QHACK #
 
     return gradient, hessian, circuit.diff_options["method"]
 
