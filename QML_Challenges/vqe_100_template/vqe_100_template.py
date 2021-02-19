@@ -65,11 +65,11 @@ def run_vqe(H):
     # or you can design your own convergence criteria)
     dev = qml.device("default.qubit", wires=2)
     circuit = qml.QNode(variational_ansatz, dev)
-    eta=0.01
+    # eta=0.01
     opt = qml.AdamOptimizer(stepsize=0.03)
     # for i in range(500):
     cost_fn = qml.ExpvalCost(variational_ansatz, H, dev)
-    for i in range(500):
+    for i in range(550):
         theta_new = opt.step(cost_fn, params)
         params = theta_new
     energy = cost_fn(theta_new)
