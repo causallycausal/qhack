@@ -36,9 +36,26 @@ def parameter_shift(weights):
         return qml.expval(qml.PauliY(0) @ qml.PauliZ(2))
 
     gradient = np.zeros_like(weights)
-
+    
     # QHACK #
-    #
+    def parameter_shift_term(qnode, weights, i): 
+        shifted = weights.copy() 
+        shifted[i] += np.pi/2
+        forward = qnode(shifted) # forward evaluation 
+
+        shifted[i] -= np.pi/2 
+        backward = qnode(shifted) # backward evaluation 
+        
+        return 0.5 * (forward - backward)
+    def parameter_shift(qnode, weights): 
+        gradients = np.zeros([len(weights)])
+
+        for i in range(len(weights)): 
+            gradients[i] = parameter_shift_term(qnode, weights, i)
+            
+        return gradients 
+
+    graident = parameter_shift(circuit, weights)
     # QHACK #
 
     return gradient
